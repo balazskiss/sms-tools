@@ -25,4 +25,11 @@ def downsampleAudio(inputFile, M):
         inputFile: file name of the wav file (including path)
         	M: downsampling factor (positive integer)
     """
-    ## Your code here
+    print('Reading file...')
+    fs, x = wavread(inputFile)
+    print('Sample rate: ', fs)
+    print('Number of samples: ', len(x))
+
+    y = x[::M]
+    newFs = fs / M
+    wavwrite(y, newFs, 'downsampled.wav')
