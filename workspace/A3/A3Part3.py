@@ -48,4 +48,14 @@ def testRealEven(x):
         dftbuffer (numpy array, possibly complex) = The M point zero phase windowed version of x 
         X (numpy array, possibly complex) = The M point DFT of dftbuffer 
     """
-    ## Your code here
+    M = x.size
+    dftbuffer = np.zeros(M)
+    dftbuffer[0:M/2+1] = x[M/2:]
+    dftbuffer[M/2+1:] = x[0:M/2]
+    X = fft(dftbuffer)
+    isRealEven = True
+    for im in np.imag(X):
+        if np.abs(im) > 1e-12:
+            isRealEven = False
+            break
+    return (isRealEven, dftbuffer, X)

@@ -60,4 +60,13 @@ def zpFFTsizeExpt(x, fs):
     xseg = x[:M]
     w1 = get_window('hamming',M)
     w2 = get_window('hamming',2*M)
-    ## Your code here 
+
+    mX1, pX1 = dftAnal(x[:256], w1, M)
+    mX2, pX2 = dftAnal(x[:512], w2, 2 * M)
+    mX3, pX3 = dftAnal(x[:256], w1, 2 * M)
+    
+    mX1_80 = mX1[0:80]
+    mX2_80 = mX2[0:80]
+    mX3_80 = mX3[0:80]
+
+    return (mX1_80, mX2_80, mX3_80)

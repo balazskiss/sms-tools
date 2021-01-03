@@ -61,5 +61,15 @@ def suppressFreqDFTmodel(x, fs, N):
     M = len(x)
     w = get_window('hamming', M)
     outputScaleFactor = sum(w)
+
+    mX, pX = dftAnal(x, w, N)
+
+    freqLim = 70.0
+    freqBinSize = fs / N
+    binLim = int(np.ceil(freqLim / freqBinSize))
+    mX2 = mX.copy()
+    mX2[0:binLim + 1] = -120.0
     
-    ## Your code here
+    y = dftSynth(mX, pX, M) * outputScaleFactor
+    yFilt = dftSynth(mX2, pX, M) * outputScaleFactor
+    return (y, yFilt)
