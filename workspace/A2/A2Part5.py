@@ -21,4 +21,10 @@ def genMagSpec(x):
         magX (numpy array) = The magnitude spectrum of the input sequence x
                              (length N)
     """
-    ## Your code here
+    N = x.size
+    X = np.array([])
+    for k in range(N):
+        s = np.exp(-1j * 2 * np.pi * k * np.arange(N) / N)
+        Xk = sum(x * s)
+        X = np.append(X, Xk)
+    return abs(X)
