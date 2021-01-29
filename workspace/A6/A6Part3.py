@@ -75,11 +75,54 @@ def estimateInharmonicity(inputFile = '../../sounds/piano.wav', t1=0.1, t2=0.5, 
                                         t1 and t2. 
     """
     # 0. Read the audio file and obtain an analysis window
+    fs, x = UF.wavread(inputFile)
+    w  = get_window(window, M)
     
     # 1. Use harmonic model to compute the harmonic frequencies and magnitudes
+    harmDevSlope=0.01
+    minSineDur = 0.0
+    xhfreq, xhmag, xhphase = HM.harmonicModelAnal(x, fs, w, N, H, t, nH, minf0, maxf0, f0et, harmDevSlope, minSineDur)
+    print(xhfreq.shape)
     
-    # 2. Extract the time segment in which you need to compute the inharmonicity. 
+    
+    # 2. Extract the time segment in which you need to compute the inharmonicity.
+    segmentStart = int(np.ceil(t1 * fs / H))
+    segmentEnd = int(np.ceil(t2 * fs / H)) + 1
+    xhFreqSegment = xhfreq[segmentStart:segmentEnd]
+    print(segmentStart)
+    print(segmentEnd)
+    print(xhFreqSegment.shape)
     
     # 3. Compute the mean inharmonicity of the segment
-
+    numberOfSamples = xhFreqSegment.shape[0]
+    inharmonicityArr = np.zeros(numberOfSamples)
+    #f0 = xhFreqSegment[0][0]
+    for sample in range(0, numberOfSamples):
+        f0 = xhFreqSegment[sample][0]
+        harmArr = np.array(range(1, nH + 1))
+        frArr = harmArr * f0
+        festArr = xhFreqSegment[sample]
+        freqNotFound = 0
+        for festIx in range(len(festArr)):
+            if festArr[festIx] < eps:
+                festArr[festIx] = 0
+                frArr[festIx] = 0
+                freqNotFound += 1
+        inhArr = np.abs(festArr - frArr) / harmArr
+        inharmonicity = np.sum(inhArr) / (len(inhArr) - freqNotFound)
+        inharmonicityArr[sample] = inharmonicity
+        print("sample " + str(sample))
+        print("f0 " + str(f0))
+        print(harmArr)
+        print(frArr)
+        print(festArr)
+        print(inhArr)
+        print(inharmonicity)
+        #for fest in festArr:
+        #    if fest < eps:
+        #        return "fasza"
+        print("")
+    print(inharmonicityArr)
+    result = np.sum(inharmonicityArr) / len(inharmonicityArr)
+    return result
 

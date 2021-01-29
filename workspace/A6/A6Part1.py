@@ -67,13 +67,13 @@ def estimateF0(inputFile = '../../sounds/cello-double-2.wav'):
     """
 
     ### Change these analysis parameter values marked as XX
-    window = XX
-    M = XX
-    N = XX
-    f0et = XX
-    t = XX
-    minf0 = XX
-    maxf0 = XX
+    window = 'blackman'
+    M = 3001
+    N = 1024 * 2 * 2 * 2
+    f0et = 20
+    t = -55
+    minf0 = 120
+    maxf0 = 210
 
     ### Do not modify the code below 
     H = 256                                                     #fix hop size
@@ -83,8 +83,8 @@ def estimateF0(inputFile = '../../sounds/cello-double-2.wav'):
     
     ### Method 1
     f0 = HM.f0Detection(x, fs, w, N, H, t, minf0, maxf0, f0et)  #estimating F0
-    startFrame = np.floor(0.5*fs/H)    
-    endFrame = np.ceil(4.0*fs/H)
+    startFrame = int(np.floor(0.5*fs/H))    
+    endFrame = int(np.ceil(4.0*fs/H))
     f0[:startFrame] = 0
     f0[endFrame:] = 0
     y = UF.sinewaveSynth(f0, 0.8, H, fs)
