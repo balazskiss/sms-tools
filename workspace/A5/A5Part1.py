@@ -59,5 +59,19 @@ def minFreqEstErr(inputFile, f):
     # analysis parameters:
     window = 'blackman'
     t = -40
+
+    fs, x = UF.wavread(inputFile)
+    for k in range(1, 100):
+        M = 100 * k + 1
+        w = get_window(window, M)
+        N = int(pow(2, np.ceil(np.log2(M))))
+        xCenter = int(0.5 * fs)
+        x2 = x[xCenter-M/2:xCenter+M/2+1]
+        mX, pX = DFT.dftAnal(x2, w, N)
+        ploc = UF.peakDetection(mX, t)
+        iploc, ipmag, ipphase = UF.peakInterp(mX, pX, ploc)
+        fEst = fs * iploc / float(N)
+        if (np.abs(fEst - f) < 0.05):
+            return fEst[0], M, N 
     
-    ### Your code here
+    
