@@ -60,5 +60,29 @@ def extractMainLobe(window, M):
 
     w = get_window(window, M)         # get the window 
     
-    ### Your code here
+    N = 8 * M
+    X = fft(w, N)
+    absX = np.abs(X)
+    absX[absX<np.finfo(float).eps] = np.finfo(float).eps
+    mX = 20 * np.log10(absX)
+
+    result = np.array([])
+
+    localMinIndex = mX.size - 1
+    for i in range(len(mX)):
+        if mX[localMinIndex - 1] < mX[localMinIndex]:
+            localMinIndex -= 1
+        else:
+            break
+    result = np.append(result, mX[localMinIndex:])
+
+    localMinIndex = 0
+    for i in range(len(mX)):
+        if mX[localMinIndex + 1] < mX[localMinIndex]:
+            localMinIndex += 1
+        else:
+            break
+    result = np.append(result, mX[:localMinIndex + 1])
+
+    return result
     

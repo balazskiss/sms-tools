@@ -59,4 +59,22 @@ def computeSNR(inputFile, window, M, N, H):
             The function should return a python tuple of both the SNR values (SNR1, SNR2)
             SNR1 and SNR2 are floats.
     """
-    ## your code here
+
+    periodicWindow = False
+    if (M % 2 == 0):
+        periodicWindow = True
+
+    fs, x = UF.wavread(inputFile)
+    w = get_window(window, M, fftbins=periodicWindow)
+    y = stft.stft(x, w, N, H)
+    noise = y - x
+    
+    Esignal = np.sum(np.square(x)) + eps
+    Enoise = np.sum(np.square(noise)) + eps
+    SNR1 = 10 * np.log10(Esignal / Enoise)
+
+    Esignal2 = np.sum(np.square(x[M:-M]))
+    Enoise2 = np.sum(np.square(noise[M:-M]))
+    SNR2 = 10 * np.log10(Esignal2 / Enoise2)
+
+    return (SNR1, SNR2)

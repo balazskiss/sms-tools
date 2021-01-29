@@ -84,4 +84,32 @@ def computeODF(inputFile, window, M, N, H):
             ODF[:,1]: ODF computed in band 3000 < f < 10000 Hz
     """
     
-    ### your code here
+    fs, x = UF.wavread(inputFile)
+    w = get_window(window, M, False)
+    xmX, xpX = stft.stftAnal(x, w, N, H)
+    energy = []
+    for mX in xmX:
+        mXLinear = pow(10, mX / 20)
+        freq = np.arange(mXLinear.size) * fs / N
+        mXLow = np.where((freq > 0) & (freq < 3000), mXLinear, 0)
+        mXHigh = np.where((freq > 3000) & (freq < 10000), mXLinear, 0)
+        ELow = np.sum(np.square(abs(mXLow)))
+        EHigh = np.sum(np.square(abs(mXHigh)))
+        ELowDB = 10 * np.log10(ELow)
+        EHighDB = 10 * np.log10(EHigh)
+        energy.append([ELowDB, EHighDB])
+
+    ODF = []
+    for ix in range(len(energy)):
+        if ix == 0:
+            ODF.append([0, 0])
+        else:
+            EDiffLow = energy[ix][0] - energy[ix - 1][0]
+            EDiffHigh = energy[ix][1] - energy[ix - 1][1]
+            ODF.append([EDiffLow, EDiffHigh])
+
+    for ix in range(len(energy)):
+        ODF[ix][0] = ODF[ix][0] if ODF[ix][0] > 0 else 0
+        ODF[ix][1] = ODF[ix][1] if ODF[ix][1] > 0 else 0
+
+    return np.asarray(ODF)

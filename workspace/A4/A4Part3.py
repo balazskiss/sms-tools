@@ -81,5 +81,18 @@ def computeEngEnv(inputFile, window, M, N, H):
             engEnv[:,1]: Energy envelope in band 3000 < f < 10000 Hz (in dB)
     """
     
-    ### your code here
-    
+    fs, x = UF.wavread(inputFile)
+    w = get_window(window, M, False)
+    xmX, xpX = stft.stftAnal(x, w, N, H)
+    result = []
+    for mX in xmX:
+        mXLinear = pow(10, mX / 20)
+        freq = np.arange(mXLinear.size) * fs / N
+        mXLow = np.where((freq > 0) & (freq < 3000), mXLinear, 0)
+        mXHigh = np.where((freq > 3000) & (freq < 10000), mXLinear, 0)
+        ELow = np.sum(np.square(abs(mXLow)))
+        EHigh = np.sum(np.square(abs(mXHigh)))
+        ELowDB = 10 * np.log10(ELow)
+        EHighDB = 10 * np.log10(EHigh)
+        result.append([ELowDB, EHighDB])
+    return np.asarray(result)
